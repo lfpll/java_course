@@ -1,17 +1,17 @@
-import edu.princeton.cs.algs4.WeightedQuickUnionUF;
+import edu.princeton.cs.algs4.QuickFindUF;
+
+import java.lang.reflect.Array;
 
 
 public class Percolation {
+    //    int[][] matrix;
     private int matrixLength;
-    private WeightedQuickUnionUF unionTree;
+    private QuickFindUF unionTree;
     private Boolean[][] openTree;
-    private int numberOfOpens;
-    private int virtualTop;
-    private int virtualBot;
 
     private void populateArray(int n) {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i <= n; i++) {
+            for (int j = 0; j <= n; j++) {
                 openTree[i][j] = false;
             }
         }
@@ -22,12 +22,10 @@ public class Percolation {
         if (n < 1) {
             throw new IllegalArgumentException("Invalid value for n");
         }
-        virtualTop = 0;
-        virtualBot = n * n + 1;
-        unionTree = new WeightedQuickUnionUF(n * n + 2);
+        unionTree = new QuickFindUF(n * n);
         openTree = new Boolean[n][n];
         matrixLength = n - 1;
-        populateArray(n);
+        populateArray(n-1);
     }
 
     // Checks to see if the size is possible to be valid
@@ -42,13 +40,17 @@ public class Percolation {
         if (isOpen(rowChild, colChild)) {
             int fatherIndex = getIndex(row, col);
             int childIndex = getIndex(rowChild, colChild);
-            unionTree.union(fatherIndex, childIndex);
+            // Making the smallest one be the dominant index
+            if (fatherIndex > childIndex) {
+                unionTree.union(fatherIndex, childIndex);
+            } else {
+                unionTree.union(childIndex, fatherIndex);
+            }
         }
     }
 
     private int getIndex(int row, int col) {
-        // Adding one because of the zero virtual bottom
-        return (row * matrixLength + col + 1);
+        return (row * matrixLength + col);
     }
 
     // Connecting the sides of the indexes
@@ -67,12 +69,6 @@ public class Percolation {
         if (col != matrixLength) {
             connectIfOpen(row, col, row, col + 1);
         }
-        if (row == matrixLength){
-            unionTree.union(getIndex(row,col),virtualBot);
-        }
-        if (row == 0){
-            unionTree.union(getIndex(row,col),virtualTop);
-        }
     }
 
     // opens the site (row, col) if it is not open already
@@ -80,7 +76,6 @@ public class Percolation {
         checkSize(row);
         checkSize(col);
         if (!openTree[row][col]) {
-            numberOfOpens++;
             openTree[row][col] = true;
         }
         connectSides(row, col);
@@ -98,29 +93,35 @@ public class Percolation {
         checkSize(row);
         checkSize(col);
         // Check if the first index is bigger then matrixLength meaning it's connect to the first row
-        int fieldIndex = getIndex(row, col);
-        return unionTree.connected(fieldIndex,virtualBot);
+        return unionTree.find(getIndex(row, col)) <= matrixLength;
     }
 
     // returns the number of open sites
     public int numberOfOpenSites() {
-        return numberOfOpens;
+        return unionTree.count();
     }
 
     // does the system percolate?
     public boolean percolates() {
-        return unionTree.connected(virtualTop,virtualBot);
+        for (int i = 0; i <= matrixLength; i++) {
+            // Check by column if the index is
+            if (unionTree.find(getIndex(matrixLength, i)) <= matrixLength) {
+                System.out.print("perlocates");
+                return true;
+            }
+        }
+        return false;
     }
 
     // test client (optional)
     public static void main(String[] args) {
         Percolation testPer = new Percolation(4);
         testPer.percolates();
-        testPer.open(0, 1);
-        testPer.open(1, 1);
-        testPer.open(2, 1);
+        testPer.open(0,1);
+        testPer.open(1,1);
+        testPer.open(2,1);
         testPer.percolates();
-        testPer.open(3, 1);
+        testPer.open(3,1);
         testPer.percolates();
 
     }
