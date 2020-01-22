@@ -26,20 +26,20 @@ public class Percolation {
         virtualBot = n * n + 1;
         unionTree = new WeightedQuickUnionUF(n * n + 2);
         openTree = new Boolean[n][n];
-        matrixLength = n - 1;
+        matrixLength = n;
         populateArray(n);
     }
 
     // Checks to see if the size is possible to be valid
-    private void checkSize(int maxLength) {
-        if (maxLength > matrixLength) {
+    private void checkSize(int rowOrColumnSize) {
+        if (rowOrColumnSize > matrixLength) {
             throw new IllegalArgumentException("Size of the function invalid");
         }
     }
 
     // Connect dots if they are open
     private void connectIfOpen(int row, int col, int rowChild, int colChild) {
-        if (isOpen(rowChild, colChild)) {
+        if (openTree[rowChild-1][colChild-1]) {
             int fatherIndex = getIndex(row, col);
             int childIndex = getIndex(rowChild, colChild);
             unionTree.union(fatherIndex, childIndex);
@@ -48,7 +48,7 @@ public class Percolation {
 
     private int getIndex(int row, int col) {
         // Adding one because of the zero virtual bottom
-        return (row * matrixLength + col + 1);
+        return (row-1) * matrixLength + col + 1;
     }
 
     // Connecting the sides of the indexes
@@ -57,21 +57,21 @@ public class Percolation {
         if (row != matrixLength) {
             connectIfOpen(row, col, row + 1, col);
         }
-        if (row != 0) {
+        if (row != 1) {
             connectIfOpen(row, col, row - 1, col);
         }
         // Connect to left and right if exists
-        if (col != 0) {
+        if (col != 1) {
             connectIfOpen(row, col, row, col - 1);
         }
         if (col != matrixLength) {
             connectIfOpen(row, col, row, col + 1);
         }
         if (row == matrixLength){
-            unionTree.union(getIndex(row,col),virtualBot);
-        }
-        if (row == 0){
             unionTree.union(getIndex(row,col),virtualTop);
+        }
+        if (row == 1){
+            unionTree.union(getIndex(row,col),virtualBot);
         }
     }
 
@@ -79,19 +79,13 @@ public class Percolation {
     public void open(int row, int col) {
         checkSize(row);
         checkSize(col);
-        if (!openTree[row][col]) {
+        if (!openTree[row-1][col-1]) {
             numberOfOpens++;
-            openTree[row][col] = true;
+            openTree[row-1][col-1] = true;
         }
         connectSides(row, col);
     }
 
-    // is the site (row, col) open?
-    public boolean isOpen(int row, int col) {
-        checkSize(row);
-        checkSize(col);
-        return openTree[row][col];
-    }
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
@@ -116,9 +110,9 @@ public class Percolation {
     public static void main(String[] args) {
         Percolation testPer = new Percolation(4);
         testPer.percolates();
-        testPer.open(0, 1);
-        testPer.open(1, 1);
-        testPer.open(2, 1);
+        testPer.open(2, 2);
+        testPer.open(2, 2);
+        testPer.open(2, 3);
         testPer.percolates();
         testPer.open(3, 1);
         testPer.percolates();

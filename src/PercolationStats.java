@@ -1,10 +1,11 @@
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
 
+
 public class PercolationStats {
     private double[] percentOpen;
     private int trialsNumber;
-    // Statisticts gathered from the process
+    // Statistics gathered from the process
     private double mean;
     private double stdev;
     private double low;
@@ -14,7 +15,7 @@ public class PercolationStats {
     public PercolationStats(int n, int trials) {
         trialsNumber = trials;
         percentOpen = new double[trials];
-        // Run Samble code with number of tries
+        // Run Sample code with number of tries
         for (int experiment = 0; experiment <= trials -1; experiment++) {
             runTrie(n,experiment);
         }
@@ -24,11 +25,11 @@ public class PercolationStats {
     {
         Percolation percTest = new Percolation(n);
         int[] random = StdRandom.permutation(n * n);
-        // Runing one sample
-        for (int index = 0; index <= n * n; index++) {
+        // Running one sample
+        for (int index = 0; index < n * n; index++) { ;
             int randIndex = random[index];
-            int row = (int) randIndex / n;
-            int col = randIndex % n;
+            int row = 1 + randIndex / n;
+            int col = 1 + randIndex % n;
             percTest.open(row, col);
             if (percTest.percolates()) {
                 break;
