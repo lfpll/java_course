@@ -32,7 +32,7 @@ public class Percolation {
 
     // Checks to see if the size is possible to be valid
     private void checkSize(int rowOrColumnSize) {
-        if (rowOrColumnSize > matrixLength) {
+        if (rowOrColumnSize > matrixLength || rowOrColumnSize < 1) {
             throw new IllegalArgumentException("Size of the function invalid");
         }
     }
@@ -46,9 +46,12 @@ public class Percolation {
         }
     }
 
+    public boolean isOpen(int row, int col){
+        return openTree[row-1][col-1];
+    }
     private int getIndex(int row, int col) {
         // Adding one because of the zero virtual bottom
-        return (row-1) * matrixLength + col + 1;
+        return (row-1) * matrixLength + col;
     }
 
     // Connecting the sides of the indexes
@@ -79,7 +82,7 @@ public class Percolation {
     public void open(int row, int col) {
         checkSize(row);
         checkSize(col);
-        if (!openTree[row-1][col-1]) {
+        if (!isOpen(row,col)) {
             numberOfOpens++;
             openTree[row-1][col-1] = true;
         }
