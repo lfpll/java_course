@@ -1,54 +1,56 @@
 import java.util.Iterator;
+import java.util.List;
 
-public class Deque<Item>  {
-    private class Node
-    {
+public class Deque<Item> {
+    private class Node {
         // Generic type name meaning I can put anything in the queue
         Item item;
         Node next;
         Node previous;
     }
+
     private Node last;
     private Node first;
     private int size;
+
     // construct an empty deque
-    public Deque()
-    {
+    public Deque() {
         last = null;
         first = null;
         size = 0;
     }
 
-    private void errorIfNull(Item item){
-        if(item == null){
-         throw new IllegalArgumentException("Item is null");
+    private void errorIfNull(Item item) {
+        if (item == null) {
+            throw new IllegalArgumentException("Item is null");
         }
     }
-    private void errorIfEmpty(){
-        if (isEmpty()){
+
+    private void errorIfEmpty() {
+        if (isEmpty()) {
             throw new java.util.NoSuchElementException();
         }
     }
+
     // is the deque empty?
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return size == 0;
     }
 
     // return the number of items on the deque
-    public int size(){
+    public int size() {
         return size;
     }
 
     // add the item to the front
-    public void addFirst(Item item){
+    public void addFirst(Item item) {
         size += 1;
         errorIfNull(item);
-        if (first == null){
+        if (first == null) {
             first = new Node();
             last = first;
             first.item = item;
-        }
-        else{
+        } else {
             Node oldFirst = first;
             first = new Node();
             first.item = item;
@@ -59,15 +61,14 @@ public class Deque<Item>  {
     }
 
     // add the item to the back
-    public void addLast(Item item){
+    public void addLast(Item item) {
         size += 1;
         errorIfNull(item);
-        if (last == null){
+        if (last == null) {
             last = new Node();
             first = last;
             last.item = item;
-        }
-        else{
+        } else {
             Node oldLast = last;
             last = new Node();
             last.item = item;
@@ -77,17 +78,15 @@ public class Deque<Item>  {
     }
 
     // remove and return the item from the front
-    public Item removeFirst()
-    {
+    public Item removeFirst() {
         errorIfEmpty();
         Item returnItem;
         size -= 1;
-        if(last == first){
+        if (last == first) {
             returnItem = first.item;
             first = null;
             last = null;
-        }
-        else{
+        } else {
             returnItem = first.item;
             first = first.next;
             first.previous = null;
@@ -96,16 +95,15 @@ public class Deque<Item>  {
     }
 
     // remove and return the item from the back
-    public Item removeLast(){
+    public Item removeLast() {
         Item returnItem;
         errorIfEmpty();
         size -= 1;
-        if(last == first){
+        if (last == first) {
             returnItem = last.item;
             first = null;
             last = null;
-        }
-        else{
+        } else {
             returnItem = last.item;
             last = last.previous;
             last.next = null;
@@ -114,11 +112,29 @@ public class Deque<Item>  {
         return returnItem;
     }
 
+    public Iterator<Item> iterator() {
+        return new ListIterator();
+    }
+
+    private class ListIterator implements Iterator<Item> {
+        private Node current = first;
+
+        public boolean hasNext() {
+            return current.next != null;
+        }
+
+        public Item next() {
+            Item thisItem = current.item;
+            current = current.next;
+            return thisItem;
+        }
+    }
+
     // return an iterator over items in order from front to back
 //    public Iterator<Item> iterator(){}
 
     // unit testing (required)
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Deque tmpDeque = new Deque();
         tmpDeque.addFirst(1);
         tmpDeque.addLast(2);
